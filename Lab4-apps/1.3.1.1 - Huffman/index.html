@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta content=" text/html;charset=utf -8" http-equiv="Content-Type">
+	<meta content="utf-8" http-equiv="encoding">
+	<!-- load the style.css -->
+	<link rel="stylesheet" href="style.css">
+	<!-- load the d3.js library -->
+	<script src="https://d3js.org/d3.v5.min.js"></script>
+</head>
+
+<body>
+	<input class="message" id="message" placeholder="String pentru compresie">
+	<button onclick="compress()">Compress</button>
+	<div class="output-empty" id="treeTitle">Arborele de compresie</div>
+	<!-- arbore.js  - a function to display a tree
+					- is based on "collapsible tree" sample from d3 library
+	-->
+	<script src="arbore.js"></script>
+	<div class="output-empty" id="codesTitle">Coduri noi:</div>
+	<ul id="codes"></ul>
+
+	<script>
+		function compress() {
+			var message = document.getElementById('message').value;
+			var codesTitle = document.getElementById('codesTitle');
+			var treeTitle = document.getElementById('treeTitle');
+			var codes = document.getElementById('codes');
+
+			if (message.trim() === '') {
+				treeTitle.innerText = "Arborele de compresie";
+				codesTitle.style.display = "block";
+				codesTitle.innerText = "Coduri noi:";
+				codes.innerHTML = '';
+				return;
+			}
+
+			var huffmanTree = generateHuffmanTree(message);
+			root = d3.hierarchy(huffmanTree);
+			root.x0 = height / 2;
+			root.y0 = 0;
+
+			update(root);
+
+			treeTitle.innerText = "Arborele de compresie pentru textul \"" + message + "\"";
+			codesTitle.style.display = "block";
+			codesTitle.innerText = "Coduri noi:";
+			codes.innerHTML = '';
+
+			displayCodes(huffmanTree, '', codes);
+		}
+
+		function displayCodes(node, code, codesElement) {
+			if (node.name.length === 1) {
+				var li = document.createElement('li');
+				li.innerText = node.name + ": " + code;
+				codesElement.appendChild(li);
+			} else {
+				displayCodes(node.children[0], code + '0', codesElement);
+				displayCodes(node.children[1], code + '1', codesElement);
+			}
+		}
+	</script>
+</body>
+</html>
